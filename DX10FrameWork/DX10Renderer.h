@@ -42,9 +42,9 @@ public:
 	/***********************
 	* Initialise: Initialise the DX10Renderer
 	* @author: Jc Fowles
-	* @Parameter: int _windowWidth: Width of the application window
-	* @Parameter: int _windowHeight: Height of the application window
-	* @Parameter: HWND _hWND: Handle to the Application window
+	* @Parameter: _windowWidth: Width of the application window
+	* @Parameter: _windowHeight: Height of the application window
+	* @Parameter: _hWND: Handle to the Application window
 	* @return: bool: Successful Initialisation
 	********************/
 	bool Initialise(int _windowWidth, int _windowHeight, HWND _hWND);

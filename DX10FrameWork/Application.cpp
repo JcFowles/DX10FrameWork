@@ -216,6 +216,7 @@ void CApplication::ExecuteOneFrame()
 	//Draw();
 	//PostDraw();
 
+	
 	m_pRenderManager->RenderFrame();
 	ProcessInput();
 }
@@ -239,3 +240,4 @@ void CApplication::SetKeyPress(int _keyIndex, bool _press)
 {
 	m_pKeyPress[_keyIndex] = _press;
 }
+

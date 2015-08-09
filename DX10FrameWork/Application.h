@@ -48,10 +48,10 @@ public:
 	/***********************
 	* WindowProc: This is the message handler for the Window, 
 	* @author: Jc Fowles
-	* @Parameter: HWND _hWnd: Handle to the Window sending the message
-	* @Parameter: UINT _msg: The message ID being sent
-	* @Parameter: WPARAM _wParam: Additional detail about the message being sent
-	* @Parameter: LPARAM _lParam: Additional detail about the message being sent
+	* @Parameter: _hWnd: Handle to the Window sending the message
+	* @Parameter: _msg: The message ID being sent
+	* @Parameter: _wParam: Additional detail about the message being sent
+	* @Parameter: _lParam: Additional detail about the message being sent
 	* @return: LRESULT: Program termination value
 	********************/
 	static LRESULT CALLBACK WindowProc(HWND _hWnd, UINT _msg, WPARAM _wParam, LPARAM _lParam);
@@ -59,10 +59,10 @@ public:
 	/***********************
 	* CreateAndRegisterWindow: Create and register the window of the application 
 	* @author: Jc Fowles
-	* @Parameter: HINSTANCE _hInstance: Instance handler for the application
-	* @Parameter: int _iWidth: Width of the window
-	* @Parameter: int _iHeight: Height of the window
-	* @Parameter: LPCWSTR _pcTitle: Title of the window
+	* @Parameter: _hInstance: Instance handler for the application
+	* @Parameter: _iWidth: Width of the window
+	* @Parameter: _iHeight: Height of the window
+	* @Parameter: _pcTitle: Title of the window
 	* @return: bool: Succesful Creation
 	********************/
 	bool CreateAndRegisterWindow(HINSTANCE _hInstance, int _iWidth, int _iHeight, LPCWSTR _pcTitle);
@@ -130,12 +130,11 @@ public:
 	/***********************
 	* SetKeyPress: Sets the Key press boolean for the input Key
 	* @author: Jc Fowles
-	* @parameter: int _keyIndex: Index of the Key to set
-	* @parameter: bool _press: Boolean value if Key is Down
+	* @parameter: _keyIndex: Index of the Key to set
+	* @parameter: _press: Boolean value if Key is Down
 	* @return: void
 	********************/
 	void SetKeyPress(int _keyIndex, bool _press);
-
 
 protected:
 private:
