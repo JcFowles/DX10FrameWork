@@ -12,6 +12,8 @@
 * Mail :	Callan.Moore@mediadesign.school.nz
 */
 
+// TO DO JC: Rename to fog shader
+
 // Inclusion Guards
 #pragma once
 #ifndef __DX10_SHADER_LITTEX_H__
