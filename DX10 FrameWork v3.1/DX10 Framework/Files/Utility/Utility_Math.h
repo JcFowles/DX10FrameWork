@@ -540,4 +540,24 @@ inline float RadiansToDegrees(float _radians)
 	return (180.0f * _radians / float(M_PI));
 }
 
+/***********************
+* RandomFloat: Returns random float in [0, 1).
+* @author: Jc Fowles
+* @return: float: random Float
+********************/
+inline float RandomFloat()
+{
+	return (float)(rand()) / (float)RAND_MAX;
+}
+
+/***********************
+* RandomFloat: Returns random float in [a, b).
+* @author: Jc Fowles
+* @return: float: random Float
+********************/
+inline float RandomFloat(float a, float b)
+{
+	return a + RandomFloat()*(b - a);
+}
+
 #endif	// __UTILITY_MATH_H__
