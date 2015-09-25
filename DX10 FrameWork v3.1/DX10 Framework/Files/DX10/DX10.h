@@ -8,7 +8,7 @@
 *
 * File Name : DX10.h
 * Description : Includes all DX10 Files
-* Author :	Callan Moore
+* Author :	Callan Moore & Jc Fowles
 * Mail :	Callan.Moore@mediadesign.school.nz
 */
 
@@ -49,5 +49,8 @@
 // Shaders
 #include "DX10\Shaders\DX10_Shader_LitTex.h"
 #include "DX10\Shaders\DX10_Shader_Fog.h"
+
+// Particle System
+#include "DX10\ParticleSystem\DX10_ParticleSystem.h"
 
 #endif	// __DX10_H__

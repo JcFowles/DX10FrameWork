@@ -46,6 +46,7 @@
 #include <windowsx.h>
 #include <string>
 #include <vector>
+#include <map>
 #include <time.h>
 
 // Local Includes

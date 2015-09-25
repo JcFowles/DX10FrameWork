@@ -230,6 +230,13 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_pTerrain = new DX10_Obj_LitTex();
 	VALIDATE(m_pTerrain->Initialise(m_pDX10_Renderer, m_pTerrainMesh, m_pLitTexShader, "TerrianTexture.png"));
 
+	// Create the Fire particle System 
+	m_pFire = new DX10_ParticleSystem();
+	std::string FireFolder = "Flame";
+	std::vector<std::string> FireTextureFiles;
+	FireTextureFiles.push_back("flare0.dds");
+	VALIDATE(m_pDX10_Renderer->InitialiseParicleSystem("Fire.fx", FireFolder, FireTextureFiles, 500, m_pFire));
+
 	// Succesfull initialization 
 	return true;
 }
@@ -274,12 +281,15 @@ void Application::ExecuteOneFrame()
 	// Limit to 60 FPS for Renderering
 	if (m_deltaTick > (1.0 / 60.0f))
 	{
+
 		if (Process(m_deltaTick) == false)
 		{
 			// A process failed to create something
 			m_online = false;
 			return;
 		}
+
+		m_pFire->Process(m_deltaTick, m_pTimer->GetGameTime());
 
 		Render();
 		m_deltaTick = 0;
@@ -326,6 +336,8 @@ void Application::Render()
 		m_pDX10_Renderer->StartRender();
 
 		m_pTerrain->Render(TECH_LITTEX_FOG);
+
+		m_pFire->Render();
 		
 		// Tell the Renderer the data input is over and present the outcome
 		m_pDX10_Renderer->EndRender();	

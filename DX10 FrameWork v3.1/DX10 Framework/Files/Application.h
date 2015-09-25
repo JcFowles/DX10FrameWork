@@ -217,6 +217,9 @@ private:
 	// Test Cube Object
 	DX10_Obj_LitTex* m_pTerrain;
 
+	// Particle Systems
+	DX10_ParticleSystem* m_pFire;
+
  
 };
 

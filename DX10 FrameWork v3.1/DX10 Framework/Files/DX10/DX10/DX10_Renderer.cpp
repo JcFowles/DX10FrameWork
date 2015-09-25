@@ -39,12 +39,14 @@ bool DX10_Renderer::Initialise(int _clientWidth, int _clientHeight, HWND _hWND)
 	//Initialise the ID Keys for the Maps
 	m_nextInputLayoutID = 0;
 	m_nextBufferID = 0;
-	m_nextTextureID = 0;
+	//m_nextTextureID = 0;
 
 	m_activeLight.dir = D3DXVECTOR3(0, -1.0f, 1.0f);
 	m_activeLight.ambient = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);
 	m_activeLight.diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	m_activeLight.specular = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+	m_pTextureManager = new DX10_TextureManager(m_pDX10Device);
 
 	return true;
 }
@@ -60,13 +62,8 @@ void DX10_Renderer::ShutDown()
 		m_pDX10SwapChain->SetFullscreenState(true, NULL);
 	}
 
-	// Delete the Graphics memory stored as DX10 Textures
-	std::map<std::string, ID3D10ShaderResourceView*>::iterator iterTexture = m_textures.begin();
-	while (iterTexture != m_textures.end())
-	{
-		ReleaseCOM(iterTexture->second);
-		iterTexture++;
-	}
+	// Delete the Textreu manager
+	ReleasePtr(m_pTextureManager);
 
 	// Delete the Graphics memory stored as DX10 InputLayers
 	std::map<UINT, ID3D10InputLayout*>::iterator iterInputLayout = m_inputLayouts.begin();
@@ -475,34 +472,50 @@ bool DX10_Renderer::CreateVertexLayout(D3D10_INPUT_ELEMENT_DESC* _vertexDesc, UI
 
 bool DX10_Renderer::CreateTexture(std::string _texFileName, ID3D10ShaderResourceView*& _prTex)
 {
-	ID3D10ShaderResourceView* pTexture = 0;
+	ID3D10ShaderResourceView* pTmpTexture = m_pTextureManager->CreateTexure(_texFileName);
 
-	// Look for the texture by name to see if it is already loaded
-	std::map<std::string, ID3D10ShaderResourceView*>::iterator texCheck;
-	texCheck = m_textures.find(_texFileName);
-
-	// Check if the Texture exists
-	if (texCheck != m_textures.end())
+	if (pTmpTexture == 0)
 	{
-		// Texture is already loaded. Save its ID
-		pTexture = texCheck->second;
+		_prTex = 0;
+		return false;
 	}
 	else
 	{
-		// Texture is new, create and save.
-		std::string filePath = TEXTUREFILEPATH;
-		filePath.append(_texFileName);
-
-		VALIDATEHR(D3DX10CreateShaderResourceViewFromFileA(m_pDX10Device,
-			filePath.c_str(), 0, 0, &pTexture, 0));
-
-		std::pair<std::string, ID3D10ShaderResourceView*> texPair(_texFileName, pTexture);
-
-		VALIDATE(m_textures.insert(texPair).second);
+		_prTex = pTmpTexture;
+		return true;
 	}
+}
 
-	_prTex = pTexture;
-	return true;
+bool DX10_Renderer::CreateTextureArray(std::string _folderName, std::vector<std::string> _texFileNames, ID3D10ShaderResourceView*& _prTex)
+{
+	ID3D10ShaderResourceView* pTmpTexture = m_pTextureManager->CreateTexureArray(_folderName, _texFileNames);
+
+	if (pTmpTexture == 0)
+	{
+		_prTex = 0;
+		return false;
+	}
+	else
+	{
+		_prTex = pTmpTexture;
+		return true;
+	}
+}
+
+bool DX10_Renderer::CreateRandomTexture(ID3D10ShaderResourceView*& _prTex)
+{
+	ID3D10ShaderResourceView* pTmpTexture = m_pTextureManager->CreateRandomTexture();
+
+	if (pTmpTexture == 0)
+	{
+		_prTex = 0;
+		return false;
+	}
+	else
+	{
+		_prTex = pTmpTexture;
+		return true;
+	}
 }
 
 void DX10_Renderer::RenderBuffer(DX10_Buffer* _buffer)

@@ -48,6 +48,16 @@
 		}                                                      \
 	}
 #endif
+#ifndef HR
+#define CHECKHR(x)                                             \
+	{                                                          \
+		HRESULT hr = (x);                                      \
+		if(FAILED(hr))                                         \
+		{                                                      \
+			DXTrace(__FILE__, (DWORD)__LINE__, hr, L#x, true); \
+		}                                                      \
+	}
+#endif
 #else
 	#ifndef VALIDATEHR
 	#define VALIDATEHR(x) (x)

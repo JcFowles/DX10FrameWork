@@ -21,10 +21,7 @@
 
 // Local Includes
 #include "../../../Utility/Utilities.h"
-#include "../Cameras/DX10_Camera_Debug.h"
 #include "../DX10_Utilities.h"
-#include "../DX10_Renderer.h"
-
 
 // Struct for the particle Vertex
 struct ParticleVertex
@@ -44,18 +41,25 @@ public:
 	DX10_ParticleSystem();
 	~DX10_ParticleSystem();
 
-	bool Initialise(ID3D10Device* _pDX10Device, ID3D10Effect* _pFX,
-		ID3D10ShaderResourceView* _texureArray, UINT _maxParticles);
+	bool Initialise(ID3D10Device* _pDX10Device, ID3D10Effect* _pFX, 
+					ID3D10ShaderResourceView* _texureArray, ID3D10ShaderResourceView* _randomtexure, 
+					D3DXVECTOR3* _pCameraPostion, D3DXMATRIX* _pMatView, D3DXMATRIX* _pMatProj,
+					UINT _maxParticles);
+
 
 	void Reset();
 	// TO DO JC: Change to a base camera
-	void SetUpPerFrame(DX10_Camera_Debug* _pCamera);
 	void Process(float _dt, float _gameTime);
 	void Render();
 
-	void SetEyePos(const v3float& _eyePosW);
-	void SetEmitPos(const v3float& _emitPosW);
-	void SetEmitDir(const v3float& _emitDirW);
+
+
+	void SetEmitterPosition(const v3float& _emitterPosition);
+	void setEmitterDirection(const v3float& _emitterDirection);
+
+	void SetCameraPosition(D3DXVECTOR3* _pCameraPosition){ m_pCameraPosition = _pCameraPosition; };
+	void SetViewMatrix(D3DXMATRIX* _pMatView){ m_pMatView = _pMatView; };
+	void SetProjMatrix(D3DXMATRIX* _pMatProj){ m_pMatProj = _pMatProj; };
 
 	// Time elapsed since the system was reset.
 	float GetAge()const { return m_age; };
@@ -78,6 +82,10 @@ private:
 
 	bool CreateRandomTexture();
 
+	bool CreateInputLayout();
+
+	
+
 	// Member Variables
 public:
 protected:
@@ -89,28 +97,36 @@ private:
 	float m_gameTime;
 	float m_timeStep;
 	float m_age;
+	
+	D3DXMATRIX* m_pMatView;
+	D3DXMATRIX* m_pMatProj;
 
-	D3DXVECTOR4 m_cameraPosition;
+	D3DXVECTOR3* m_pCameraPosition;
+
 	D3DXVECTOR4 m_emitterPosition;
 	D3DXVECTOR4 m_emitterDirection;
 
 	ID3D10Device* m_pDX10Device;
-	
+
+	ID3D10InputLayout* m_pInputLayout;
+
 	ID3D10Buffer* m_pInitialVB;
 	ID3D10Buffer* m_pRenderVB;
 	ID3D10Buffer* m_pStreamOutVB;
-	
+
 	ID3D10ShaderResourceView* m_pTexureArray;
 	ID3D10ShaderResourceView* m_pRandomTexure;
-	
+
+	ID3D10Effect* m_pEffect;
+
 	ID3D10EffectTechnique* m_pStreamOutTech;
 	ID3D10EffectTechnique* m_pRenderTech;
 
-	ID3D10EffectMatrixVariable* m_pFXMatViewVar;
-	ID3D10EffectMatrixVariable* m_pFXMatProjVar;
 	ID3D10EffectScalarVariable* m_pFXGameTimeVar;
 	ID3D10EffectScalarVariable* m_pFXTimeStepVar;
-	ID3D10EffectVectorVariable* m_pFXEyePosVar;
+	ID3D10EffectMatrixVariable* m_pFXMatViewVar;
+	ID3D10EffectMatrixVariable* m_pFXMatProjVar;
+	ID3D10EffectVectorVariable* m_pFXCameraPosVar;
 	ID3D10EffectVectorVariable* m_pFXEmitterPosVar;
 	ID3D10EffectVectorVariable* m_pFXEmitterDirVar;
 

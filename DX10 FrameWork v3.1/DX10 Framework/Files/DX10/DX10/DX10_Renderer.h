@@ -8,8 +8,11 @@
 *
 * File Name : DX10_Renderer.h
 * Description : Holds the DirectX10 Device and Renders all Objects created by the DirectX10 device
-* Author :	Callan Moore
+* Author :	Callan Moore 
 * Mail :	Callan.Moore@mediadesign.school.nz
+* Author :	Jc Fowles
+* Mail :	Jc.Fowles@mediadesign.school.nz
+
 */
 
 // Inclusion Guards
@@ -18,7 +21,6 @@
 #define __DX10_RENDERER_H__
 
 // Library Includes
-#include <map>
 #include <typeinfo> 
 #include <time.h>
 #include <fstream>
@@ -28,6 +30,8 @@
 #include "../../Utility/Utilities.h"
 #include "DX10_Vertex.h"
 #include "Systems/DX10_Buffer.h"
+#include "Systems\DX10_TextureManager.h"
+#include "ParticleSystem\DX10_ParticleSystem.h"
 
 struct PolygonType
 {
@@ -48,7 +52,8 @@ public:
 
 	/***********************
 	* Initialise: Initialise the DX10 Renderer
-	* @author: Callan Moore
+	* @author: Callan Moore 
+	* @author: Jc Fowles
 	* @Parameter: _clientWidth: Width of the client window
 	* @Parameter: _clientHeight: Height of the client window
 	* @Parameter: _hWND: Handle to the Application window
@@ -179,14 +184,33 @@ public:
 	}
 
 	/***********************
-	* CreateTexture: Create a Texture from a file and store it on the Renderer
+	* CreateTexture: Create a Texture from a file
 	* @author: Callan Moore
+	* @author: Jc Fowles
 	* @parameter: _texFileName: The filename of the texture
 	* @parameter: _prTex: Storage variable to hold the Pointer to the created Texture
 	* @return: bool: Successful or not
 	********************/
 	bool CreateTexture(std::string _texFileName, ID3D10ShaderResourceView*& _prTex);
 
+	/***********************
+	* CreateTextureArray: Create a Texture Array from multiple files stored in a single folder
+	* @author: Jc Fowles
+	* @parameter: _folderName: The filename of the folder the textures are stored in
+	* @parameter: _texFileNames: The list of texture files
+	* @parameter: _prTex: Storage variable to hold the Pointer to the created Texture
+	* @return: bool: Successful or not
+	********************/
+	bool CreateTextureArray(std::string _folderName, std::vector<std::string> _texFileNames, ID3D10ShaderResourceView*& _prTex);
+	
+	/***********************
+	* CreateRandomTexture: Create a Random 1D Texture 
+	* @author: Jc Fowles
+	* @parameter: _prTex: Storage variable to hold the Pointer to the created Texture
+	* @return: bool: Successful or not
+	********************/
+	bool CreateRandomTexture(ID3D10ShaderResourceView*& _prTex);
+	
 	/***********************
 	* RenderBuffer: Renders an Buffer to the screen
 	* @author: Callan Moore
@@ -338,6 +362,63 @@ public:
 	}
 
 
+	/**********
+	* Particle System 
+	**********/
+
+	// TO DO JC:
+	bool InitialiseParicleSystem(std::string _fxFileName, std::string _textureFolder, std::vector<std::string> _textureFiles, UINT _maxParticles, DX10_ParticleSystem* _pParticleSystem)
+	{
+
+		// Create the Effect from the .fx file
+
+		ID3D10Effect* pParticleFX = 0;
+		
+		// Set the shader flags to enforce strictness
+		DWORD shaderFlags = D3D10_SHADER_ENABLE_STRICTNESS;
+		#if defined( DEBUG ) || defined( _DEBUG )
+			// Addition shader flags for information in DEBUG mode only
+			shaderFlags |= D3D10_SHADER_DEBUG;
+			shaderFlags |= D3D10_SHADER_SKIP_OPTIMIZATION;
+		#endif
+
+		ID3D10Blob* compilationErrors;
+
+		// Add the directory path from the DX10Render file to the stored FX files
+		std::string fxfilePath = "Resources/FX/" + _fxFileName;
+
+		// Create the FX file from the input file string
+		//VALIDATEHR
+		HRESULT hr = (D3DX10CreateEffectFromFileA(fxfilePath.c_str(), 0, 0,
+				"fx_4_0", shaderFlags, 0, m_pDX10Device, 0, 0, &pParticleFX, &compilationErrors, 0));
+
+		if (FAILED(hr))
+		{
+			if (compilationErrors)
+			{
+				MessageBoxA(0, (char*)compilationErrors->GetBufferPointer(), 0, 0);
+				ReleaseCOM(compilationErrors);
+			}
+			DXTraceA(__FILE__, (DWORD)__LINE__, hr, fxfilePath.c_str(), true);
+		}
+
+		ReleaseCOM(compilationErrors);
+
+		// Create the Random Texture
+		ID3D10ShaderResourceView* randomTexture;
+		VALIDATE(CreateRandomTexture(randomTexture));
+
+		// Create the Texture Array
+		ID3D10ShaderResourceView* texureArray;
+		VALIDATE(CreateTextureArray(_textureFolder,_textureFiles, texureArray));
+
+		// Initialise the Particle System
+		VALIDATE(_pParticleSystem->Initialise(m_pDX10Device, pParticleFX, texureArray, randomTexture, &m_eyePos, &m_matView, &m_matProj, _maxParticles));
+
+		// Return Succesfull Initialization
+		return true;
+	}
+
 private:
 	// Window Variables
 	HWND m_hWnd;
@@ -364,6 +445,8 @@ private:
 	D3D10_DRIVER_TYPE m_dx10DriverType;
 	D3DXCOLOR m_clearColor;
 
+	DX10_TextureManager* m_pTextureManager;
+
 	// Map of FX files
 	std::map<std::string, ID3D10Effect*> m_fxFiles;
 
@@ -377,11 +460,7 @@ private:
 	// Map of all Buffers
 	UINT m_nextBufferID;
 	std::map<UINT, DX10_Buffer*> m_buffers;
-
-	// Map of all Textures
-	UINT m_nextTextureID;
-	std::map<std::string, ID3D10ShaderResourceView*> m_textures;
-
+	
 	// Lighting
 	Light m_activeLight;
 
